@@ -84,23 +84,13 @@ export class TenantStyleEditComponent extends Component {
       <UserBackOffice tab="Tenants" isLoading={!this.state.tenant}>
         {this.state.tenant && (
           <Can I={manage} a={daikoku} dispatchError>
-            <div className="d-flex flex-row justify-content-between mb-1">
-              <div>
-                <button
-                  className="btn btn-access-negative"
-                  onClick={() => this.setState({ preview: !this.state.preview })}>
-                  <Translation i18nkey="Preview" language={this.props.currentLanguage}>
-                    Preview
-                  </Translation>
-                </button>
-              </div>
-              <div>
+              <div className="position-fixed" style={{right:'10px'}}>
                 <button className="btn btn-access-negative mr-2" onClick={() => this.goBack()}>
                   <Translation i18nkey="Cancel" language={this.props.currentLanguage}>
                     Cancel
                   </Translation>
                 </button>
-                <button className="btn btn-access-negative mrx-2" onClick={() => this.reset()}>
+                <button className="btn btn-access-negative mr-2" onClick={() => this.reset()}>
                   <Translation i18nkey="Reset" language={this.props.currentLanguage}>
                     Reset
                   </Translation>
@@ -111,10 +101,9 @@ export class TenantStyleEditComponent extends Component {
                   </Translation>
                 </button>
               </div>
-            </div>
-            <div className="flex-row d-flex ">
+            <div className="flex-row d-flex mt-5">
               {!this.state.preview && (
-                <div className="flex-grow-0">
+                <div>
                   {Object.entries(_.groupBy(this.state.style, 'group'))
                     .sort((a, b) => b[1] - a[1])
                     .map((item, idx) => {
@@ -144,7 +133,7 @@ export class TenantStyleEditComponent extends Component {
                     })}
                 </div>
               )}
-              <Preview className="flex-grow-1" variables={this.state.style} />
+              <Preview variables={this.state.style} />
             </div>
           </Can>
         )}
@@ -201,7 +190,10 @@ class Preview extends React.Component {
       <iframe
         ref="iframe"
         style={{
-          height: '100vh',
+          width:'60%',
+          position:'fixed',
+          right:'10px',
+          height: '70vh',
           border: 'none',
           boxShadow: '0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22)',
           borderRadius: '4px',
