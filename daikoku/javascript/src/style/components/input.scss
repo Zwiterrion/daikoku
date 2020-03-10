@@ -25,6 +25,7 @@
     background-color: $form-bg-color !important;
     border-color: $form-border-color !important;
     color:$form-text-color !important;
+    z-index: 10 !important;
 }
 
 .reactSelect__option--is-focused{
