@@ -41,7 +41,6 @@ export class MailgunConfig extends Component {
           onChange={this.props.onChange}
           flow={this.formFlow}
           schema={this.formSchema}
-          style={{ marginTop: 50 }}
         />
       </React.Suspense>
     );

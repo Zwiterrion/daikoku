@@ -438,7 +438,6 @@ export class OAuth2Config extends Component {
           }}
           flow={this.formFlow}
           schema={this.formSchema}
-          style={{ marginTop: 50 }}
         />
       </React.Suspense>
     );

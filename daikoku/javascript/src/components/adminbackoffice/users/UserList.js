@@ -127,7 +127,7 @@ class UserListComponent extends Component {
                       infos={
                         <>
                           {user.isDaikokuAdmin && (
-                            <i className="fas fa-shield-alt" style={{ marginRight: '10px' }} />
+                            <i className="fas fa-shield-alt mr-2"/>
                           )}
                           <span className="team__name text-truncate">{user.name}</span>
                         </>

@@ -758,10 +758,9 @@ export class TenantEditComponent extends Component {
                   schema={this.schema}
                   value={this.state.tenant}
                   onChange={tenant => this.setState({ tenant, updated: true })}
-                  style={{ marginBottom: 100, paddingTop: 20 }}
+                  style={{ marginBottom: 100 }}
                 />
               </React.Suspense>
-              <div style={{ height: 60 }} />
               <div className="row form-back-fixedBtns">
                 <Link className="btn btn-outline-primary" to={'/settings/tenants'}>
                   <i className="fas fa-chevron-left mr-1" />
@@ -770,9 +769,8 @@ export class TenantEditComponent extends Component {
                   </Translation>
                 </Link>
                 <button
-                  style={{ marginLeft: 5 }}
                   type="button"
-                  className="btn btn-outline-success"
+                  className="btn btn-outline-success ml-2"
                   {...disabled}
                   onClick={this.save}>
                   {!this.state.create && (
