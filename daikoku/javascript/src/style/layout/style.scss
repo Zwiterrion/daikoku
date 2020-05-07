@@ -163,7 +163,7 @@ img:hover+.changePicture,.changePicture:hover{
 }
 
 .nav-tabs{
-  border-color: $btn-border-color;
+  //border-color: $btn-border-color;
   .nav-link:hover,.nav-link:focus{
       cursor: pointer;
       background-color: $btn-bg-hover-color;
@@ -240,6 +240,85 @@ img:hover+.changePicture,.changePicture:hover{
   .h1-rwd-reduce {
     font-size: 1.8rem;
   }
+}
+
+.tabeus input ~ ul > li.burger, #burger {
+  display: none;
+}
+
+@media only screen and (max-width: 767px) {
+  .nav-tabs {
+    width: auto;
+ // border-bottom: 1px solid $btn-border-color;
+    .nav-link {
+      margin-right: 0px;
+    }
+  }
+
+
+
+  .tabeus input:checked ~ ul > li {
+    display: contents;
+  }
+
+  .tabeus input:checked + ul {
+    flex-direction: column;
+  }
+
+  .tabeus input:checked + ul > li:nth-child(2) a {
+    //margin-left: 80px;
+    margin-top: -1px;
+  }
+
+  .tabeus input ~ ul > li {
+    display: none
+  }
+
+  .tabeus li > a {
+    margin-right: 0px;
+    margin-bottom: -1px;
+  }
+  .tabeus input ~ ul > li.active {
+    display: block;
+  }
+
+  .tabeus input ~ ul > li.burger {
+    display: block;
+    margin-right: 10px;
+  }
+  .nav-tabs > li label {
+    border: 1px solid $btn-border-color;
+    border-radius: 4px 4px 0 0;
+    transition-duration: 1s;
+    padding: 8px 8px;
+    margin-bottom: 0px;
+  }
+
+  .nav-tabs {
+    /*border-bottom: 1px solid $primaryColor;
+    position: fixed;
+    width: 100%;
+    background-color: $fondBody;
+    z-index: 10;
+    margin-left: 25px;*/
+
+    > li.active > a:focus,
+    > li.active > a:hover,
+    > li.active > a {
+      color: $btn-text-color;
+      cursor: default;
+      background-color: $btn-bg-color;
+      border: 1px solid $btn-border-color;
+      border-bottom-color: transparent;
+    }
+
+    .nav-link {
+      border: 1px solid $btn-border-color ;
+     // border-top-left-radius: 0px;
+     // border-top-right-radius: 0px;
+    }
+  }
+
 }
 
 .ohnohoney {

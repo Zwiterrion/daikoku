@@ -139,6 +139,10 @@ class TeamApiComponent extends Component {
       });
   };
 
+  onTabSelected() {
+    document.getElementById("burger").checked = false;
+  };
+
   transformPossiblePlansBack = (api) => {
     if (!api) {
       return api;
@@ -286,35 +290,41 @@ class TeamApiComponent extends Component {
                   </h1>
                 )}
               </div>
-              <div className="row">
-                <ul className="nav nav-tabs flex-column flex-sm-row mb-3 mt-3">
-                  <li className="nav-item">
+              <div className="row tabeus">
+                <input id="burger" type="checkbox"/>
+                <ul className="nav nav-tabs mb-3 mt-3">
+                  <li className="burger">
+                    <label htmlFor="burger">
+                      <i className="fas fa-caret-down"/>
+                    </label>
+                  </li>
+                  <li className={`nav-item ${tab === 'infos' ? 'active' : ''}`}>
                     <Link
                       className={`nav-link ${tab === 'infos' ? 'active' : ''}`}
                       to={`/${this.props.currentTeam._humanReadableId}/settings/apis/${editedApi._humanReadableId}/infos`}
-                      onClick={() => this.setState({ tab: 'infos' })}>
+                      onClick={() => {this.setState({ tab: 'infos' });this.onTabSelected()}}>
                       <i className="fas fa-info mr-1" />
                       <Translation i18nkey="Informations" language={this.props.currentLanguage}>
                         Informations
                       </Translation>
                     </Link>
                   </li>
-                  <li className="nav-item">
+                  <li className={`nav-item ${tab === 'description' ? 'active' : ''}`}>
                     <Link
                       className={`nav-link ${tab === 'description' ? 'active' : ''}`}
                       to={`/${this.props.currentTeam._humanReadableId}/settings/apis/${editedApi._humanReadableId}/description`}
-                      onClick={() => this.setState({ tab: 'description' })}>
+                      onClick={() => {this.setState({ tab: 'description' });this.onTabSelected()}}>
                       <i className="fas fa-file-alt mr-1" />
                       <Translation i18nkey="Description" language={this.props.currentLanguage}>
                         Description
                       </Translation>
                     </Link>
                   </li>
-                  <li className="nav-item">
+                  <li className={`nav-item ${tab === 'pricing' ? 'active' : ''}`}>
                     <Link
                       className={`nav-link ${tab === 'pricing' ? 'active' : ''}`}
                       to={`/${this.props.currentTeam._humanReadableId}/settings/apis/${editedApi._humanReadableId}/plans`}
-                      onClick={() => this.setState({ tab: 'pricing' })}>
+                      onClick={() => {this.setState({ tab: 'pricing' });this.onTabSelected()}}>
                       <i className="fas fa-dollar-sign mr-1" />
                       <Translation i18nkey="Plan" language={this.props.currentLanguage} isPlural>
                         Plans
@@ -322,11 +332,11 @@ class TeamApiComponent extends Component {
                     </Link>
                   </li>
                   {false && (
-                    <li className="nav-item">
+                    <li className={`nav-item ${tab === 'otoroshi' ? 'active' : ''}`}>
                       <Link
                         className={`nav-link ${tab === 'otoroshi' ? 'active' : ''}`}
                         to={`/${this.props.currentTeam._humanReadableId}/settings/apis/${editedApi._humanReadableId}/otoroshi`}
-                        onClick={() => this.setState({ tab: 'otoroshi' })}>
+                        onClick={() => {this.setState({ tab: 'otoroshi' });this.onTabSelected()}}>
                         <i className="fas fa-pastafarianism mr-1" />
                         <Translation i18nkey="Otoroshi" language={this.props.currentLanguage}>
                           Otoroshi
@@ -334,11 +344,11 @@ class TeamApiComponent extends Component {
                       </Link>
                     </li>
                   )}
-                  <li className="nav-item">
+                  <li className={`nav-item ${tab === 'swagger' ? 'active' : ''}`}>
                     <Link
                       className={`nav-link ${tab === 'swagger' ? 'active' : ''}`}
                       to={`/${this.props.currentTeam._humanReadableId}/settings/apis/${editedApi._humanReadableId}/swagger`}
-                      onClick={() => this.setState({ tab: 'swagger' })}>
+                      onClick={() => {this.setState({ tab: 'swagger' });this.onTabSelected()}}>
                       <i className="fas fa-file-code mr-1" />
                       <Translation i18nkey="Swagger" language={this.props.currentLanguage}>
                         Swagger
@@ -346,11 +356,11 @@ class TeamApiComponent extends Component {
                     </Link>
                   </li>
                   {editedApi.visibility !== 'AdminOnly' && (
-                    <li className="nav-item">
+                    <li className={`nav-item ${tab === 'testing' ? 'active' : ''}`}>
                       <Link
                         className={`nav-link ${tab === 'testing' ? 'active' : ''}`}
                         to={`/${this.props.currentTeam._humanReadableId}/settings/apis/${editedApi._humanReadableId}/testing`}
-                        onClick={() => this.setState({ tab: 'testing' })}>
+                        onClick={() => {this.setState({ tab: 'testing' });this.onTabSelected()}}>
                         <i className="fas fa-vial mr-1" />
                         <Translation i18nkey="Testing" language={this.props.currentLanguage}>
                           Testing
@@ -358,11 +368,11 @@ class TeamApiComponent extends Component {
                       </Link>
                     </li>
                   )}
-                  <li className="nav-item">
+                  <li className={`nav-item ${tab === 'documentation' ? 'active' : ''}`}>
                     <Link
                       className={`nav-link ${tab === 'documentation' ? 'active' : ''}`}
                       to={`/${this.props.currentTeam._humanReadableId}/settings/apis/${editedApi._humanReadableId}/documentation`}
-                      onClick={() => this.setState({ tab: 'documentation' })}>
+                      onClick={() => {this.setState({ tab: 'documentation' });this.onTabSelected()}}>
                       <i className="fas fa-book mr-1" />
                       <Translation i18nkey="Documentation" language={this.props.currentLanguage}>
                         Documentation
