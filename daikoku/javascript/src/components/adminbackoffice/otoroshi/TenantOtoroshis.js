@@ -20,16 +20,19 @@ export class TenantOtoroshisComponent extends Component {
     {
       Header: t('Url', this.props.currentLanguage),
       style: { textAlign: 'left' },
+      width:200,
       accessor: (item) => item.url,
     },
     {
       Header: t('Host', this.props.currentLanguage),
       style: { textAlign: 'left' },
+      width:200,
       accessor: (item) => item.host,
     },
     {
       Header: t('Actions', this.props.currentLanguage),
       style: { textAlign: 'center'},
+      width:150,
       disableSortBy: true,
       disableFilters: true,
       accessor: (item) => item._id,

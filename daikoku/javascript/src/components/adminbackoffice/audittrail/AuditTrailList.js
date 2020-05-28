@@ -20,6 +20,7 @@ export class AuditTrailList extends Component {
       Header: 'Date',
       accessor: (item) => item['@timestamp']['$long'], //todo: try to remove this $long prop from reactivemongo
       style: { textAlign: 'left' },
+      width:150,
       Cell: ({value}) => {
         return moment(value).format('YYYY-MM-DD HH:mm:ss.SSS');
       }
@@ -27,21 +28,25 @@ export class AuditTrailList extends Component {
     {
       Header: 'Name',
       style: { textAlign: 'left' },
+      width:200,
       accessor: (item) => item.user.name,
     },
     {
       Header: 'Impersonator',
       style: { textAlign: 'left'},
+      width:200,
       accessor: (item) => (item.impersonator ? item.impersonator.name : ''),
     },
     {
       Header: 'Message',
+      width:300,
       style: {  textAlign: 'left' },
       accessor: (item) => item.message,
     },
     {
       Header: 'Actions',
       style: {  textAlign: 'center'},
+      width:100,
       disableSortBy: true,
       disableFilters: true,
       accessor: (item) => item._id,

@@ -14,22 +14,26 @@ class SessionListComponent extends Component {
     {
       Header: t('User', this.props.currentLanguage),
       style: { textAlign: 'left'},
+      width:200,
       accessor: (item) => item.userName + ' - ' + item.userEmail,
     },
     {
       Header: t('Impersonator', this.props.currentLanguage),
       style: { textAlign: 'left' },
+      width:200,
       accessor: (item) =>
         item.impersonatorId ? `${item.impersonatorName} - ${item.impersonatorEmail}` : '',
     },
     {
       Header: t('Created at', this.props.currentLanguage),
+      width:150,
       style: { textAlign: 'left' },
       accessor: (item) => moment(item.created).format('YYYY-MM-DD HH:mm:ss.SSS'),
     },
     {
       Header: t('Expires', this.props.currentLanguage),
       style: { textAlign: 'left'},
+      width:150,
       accessor: (item) => moment(item.expires).format('YYYY-MM-DD HH:mm:ss.SSS'),
     },
     {
@@ -37,6 +41,7 @@ class SessionListComponent extends Component {
       style: { textAlign:'center' },
       disableSortBy: true,
       disableFilters: true,
+      width:100,
       content: (item) => item._id,
       Cell: ({ cell: { row: {original} } }) => {
         const session = original;
