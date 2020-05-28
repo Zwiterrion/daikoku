@@ -79,6 +79,9 @@ export const Table = ({ fetchItems, columns, injectTopBar, injectTable, defaultS
       Filter: DefaultColumnFilter,
       // And also our default editable cell
       Cell: EditableCell,
+      minWidth: 30,
+      width: 300,
+      maxWidth: 400,
     }),
     []
   )
@@ -121,6 +124,8 @@ export const Table = ({ fetchItems, columns, injectTopBar, injectTable, defaultS
     useFilters,
     useSortBy,
     usePagination,
+    useBlockLayout,
+    useResizeColumns,
   );
 
   useEffect(() => {
@@ -235,6 +240,10 @@ export const Table = ({ fetchItems, columns, injectTopBar, injectTable, defaultS
                       "--sort-desc": column.isSorted && column.isSortedDesc
                     })} style={column.style}>
                       <div {...column.getHeaderProps(column.getSortByToggleProps())}>{column.render("Header")}</div>
+                      <div
+                          {...column.getResizerProps()}
+                          className={`resizer ${column.isResizing ? 'isResizing' : ''}`}
+                      />
                       <div className="my-2">{column.canFilter ? column.render('Filter') : null}</div>
                     </th>
                   ))}

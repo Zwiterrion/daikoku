@@ -19,7 +19,7 @@ export class TeamApiKeysComponent extends Component {
   columns = [
     {
       Header: t('Api Name', this.props.currentLanguage),
-      style: { textAlign: 'left' },
+      style: { textAlign: 'left',width:'100px', maxWidth:'200px' },
       accessor: (api) => api.name,
     },
     {
