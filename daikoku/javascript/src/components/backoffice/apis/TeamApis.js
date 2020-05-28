@@ -18,6 +18,7 @@ class TeamApisComponent extends Component {
       style: { textAlign: 'left'},
       accessor: (api) => api.name,
       sortType: "basic",
+      width:200,
     },
     {
       Header: t('Description', this.props.currentLanguage),
@@ -31,6 +32,7 @@ class TeamApisComponent extends Component {
       disableSortBy: true,
       Filter: BooleanColumnFilter,
       filter: 'equals',
+      width:50,
       Cell: ({ cell: { row: {original} } }) => {
         const api = original;
         return (<Can I={manage} a={Api} team={this.props.currentTeam}>
@@ -49,6 +51,7 @@ class TeamApisComponent extends Component {
       style: { textAlign: 'center'},
       disableSortBy: true,
       disableFilters: true,
+      width:100,
       accessor: (item) => item._id,
       Cell: ({ cell: { row: { original } } }) => {
         const api = original;

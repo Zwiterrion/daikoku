@@ -254,23 +254,25 @@ class AssetsListComponent extends Component {
       Header: t('Filename', this.props.currentLanguage),
       style: { textAlign: 'left' },
       accessor: (item) => (item.meta && item.meta.filename ? item.meta.filename : '--'),
+      width:100,
     },
     {
       Header: t('Title', this.props.currentLanguage),
       style: { textAlign: 'left' },
       accessor: (item) => (item.meta && item.meta.title ? item.meta.title : '--'),
+      width:100,
     },
     {
       Header: t('Description', this.props.currentLanguage),
       style: { textAlign: 'left' },
       accessor: (item) => (item.meta && item.meta.desc ? item.meta.desc : '--'),
+      width:100,
     },
     {
       Header: t('Thumbnail', this.props.currentLanguage),
       style: { textAlign: 'left'},
       disableSortBy: true,
       disableFilters: true,
-      disableResizing: true,
       width: 80,
       accessor: (item) => item._id,
       Cell: ({ cell: { row: { original } } }) => {
@@ -310,6 +312,7 @@ class AssetsListComponent extends Component {
     {
       Header: t('Content-Type', this.props.currentLanguage),
       style: { textAlign: 'left' },
+      width:100,
       accessor: (item) =>
         item.meta && item.meta['content-type'] ? item.meta['content-type'] : '--',
     },
@@ -318,6 +321,7 @@ class AssetsListComponent extends Component {
       disableSortBy: true,
       disableFilters: true,
       style: {textAlign: 'center' },
+      width:100,
       accessor: (item) => item._id,
       Cell: ({ cell: { row: { original } } }) => {
         const item = original;

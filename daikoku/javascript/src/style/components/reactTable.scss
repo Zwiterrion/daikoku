@@ -34,9 +34,6 @@
 		border-right-style: solid;
 		border-right-width: 1px;
 		position: relative;
-		:last-child {
-			border-right: 0;
-		}
 	}
 	.switch--loaded label{
 		margin-bottom: 0px;

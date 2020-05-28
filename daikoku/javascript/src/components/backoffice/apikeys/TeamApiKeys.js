@@ -19,8 +19,9 @@ export class TeamApiKeysComponent extends Component {
   columns = [
     {
       Header: t('Api Name', this.props.currentLanguage),
-      style: { textAlign: 'left',width:'100px', maxWidth:'200px' },
-      accessor: (api) => api.name,
+      style: { textAlign: 'left',
+      accessor: (api) => api.name},
+      width:100,
     },
     {
       Header: t('Version', this.props.currentLanguage),
@@ -32,6 +33,7 @@ export class TeamApiKeysComponent extends Component {
       style: { textAlign: 'center'},
       disableSortBy: true,
       disableFilters: true,
+      width:100,
       accessor: (item) => item._id,
       Cell: ({ cell: { row: {original} } }) => {
         const api = original;
