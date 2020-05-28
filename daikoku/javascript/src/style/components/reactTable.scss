@@ -59,19 +59,6 @@
 		}
 	}
 
-	.reactSelect-pagination {
-		.reactSelect__indicator-separator {
-			margin:0px;
-		}
-		.reactSelect__value-container {
-			margin-top: -2px;
-			padding: 0px 8px;
-		}
-		.reactSelect__indicator{
-			padding: 0px 8px;
-		}
-	}
-
 	.table-filter-suppress{
 		transform:rotate(90deg);
 		padding: .2rem .2rem;
@@ -84,5 +71,18 @@
 			transform-origin: 0% 0%;
 		}
 	}
+}
 
+
+.reactSelect-pagination {
+  .reactSelect__indicator-separator {
+    margin:0px;
+  }
+  .reactSelect__value-container {
+    margin-top: -2px;
+    padding: 0px 8px;
+  }
+  .reactSelect__indicator{
+    padding: 0px 8px;
+  }
 }
