@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useTable, usePagination, useSortBy, useFilters, useBlockLayout, useResizeColumns } from 'react-table';
+import { useTable, usePagination, useSortBy, useFilters, useFlexLayout, useResizeColumns } from 'react-table';
 import classNames from 'classnames';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -124,7 +124,7 @@ export const Table = ({ fetchItems, columns, injectTopBar, injectTable, defaultS
     useFilters,
     useSortBy,
     usePagination,
-    useBlockLayout,
+    useFlexLayout,
     useResizeColumns,
   );
 
@@ -239,7 +239,7 @@ export const Table = ({ fetchItems, columns, injectTopBar, injectTable, defaultS
                       "--sort-asc": column.isSorted && !column.isSortedDesc,
                       "--sort-desc": column.isSorted && column.isSortedDesc
                     })} style={column.style} {...column.getHeaderProps(column.getSortByToggleProps())}>
-                      <div >{column.render("Header")}</div>
+                      <div style={column.style}>{column.render("Header")}</div>
                       {column.canResize && <div
                           {...column.getResizerProps()}
                           className={`resizer ${column.isResizing ? 'isResizing' : ''}`}
