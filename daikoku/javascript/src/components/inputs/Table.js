@@ -238,12 +238,12 @@ export const Table = ({ fetchItems, columns, injectTopBar, injectTable, defaultS
                     <th key={`thead-th-${idx}`} className={classNames({
                       "--sort-asc": column.isSorted && !column.isSortedDesc,
                       "--sort-desc": column.isSorted && column.isSortedDesc
-                    })} style={column.style}>
-                      <div {...column.getHeaderProps(column.getSortByToggleProps())}>{column.render("Header")}</div>
-                      <div
+                    })} style={column.style} {...column.getHeaderProps(column.getSortByToggleProps())}>
+                      <div >{column.render("Header")}</div>
+                      {column.canResize && <div
                           {...column.getResizerProps()}
                           className={`resizer ${column.isResizing ? 'isResizing' : ''}`}
-                      />
+                      />}
                       <div className="my-2">{column.canFilter ? column.render('Filter') : null}</div>
                     </th>
                   ))}

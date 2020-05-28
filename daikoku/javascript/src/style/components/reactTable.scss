@@ -27,6 +27,8 @@
 		background-color: rgba(0, 0, 0, 0.03);
 	}
 	td{
+		overflow: hidden;
+		text-overflow: ellipsis;
 		padding: 7px 5px;
 		border-right-color: rgba(0, 0, 0, 0.02);
 		border-right-style: solid;

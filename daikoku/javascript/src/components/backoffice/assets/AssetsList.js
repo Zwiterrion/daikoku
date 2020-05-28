@@ -270,6 +270,8 @@ class AssetsListComponent extends Component {
       style: { textAlign: 'left'},
       disableSortBy: true,
       disableFilters: true,
+      disableResizing: true,
+      width: 80,
       accessor: (item) => item._id,
       Cell: ({ cell: { row: { original } } }) => {
         const item=original;
