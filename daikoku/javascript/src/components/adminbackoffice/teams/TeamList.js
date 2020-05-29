@@ -79,7 +79,7 @@ class TeamListComponent extends Component {
         <Can I={manage} a={tenant} dispatchError>
           <div className="row">
             <div className="col">
-              <div className="d-flex justify-content-between align-items-center">
+              <div className="d-flex justify-content-between">
                 <h1>
                   <Translation i18nkey="Teams" language={this.props.currentLanguage}>
                     Teams
@@ -95,13 +95,20 @@ class TeamListComponent extends Component {
                     <i className="fas fa-plus-circle" />
                   </a>
                 </h1>
-                <input
-                  placeholder={t('Find a team', this.props.currentLanguage)}
-                  className="form-control col-5"
-                  onChange={(e) => {
-                    this.setState({ search: e.target.value });
-                  }}
-                />
+                <div className="form-group">
+                  <div className="input-group">
+                    <div className="input-group-prepend">
+                      <div className="input-group-text"><i className="fas fa-search"></i></div>
+                    </div>
+                    <input
+                        placeholder={t('Find a team', this.props.currentLanguage)}
+                        className="form-control"
+                        onChange={(e) => {
+                          this.setState({ search: e.target.value });
+                        }}
+                    />
+                  </div>
+                </div>
               </div>
               <PaginatedComponent
                 items={_.sortBy(filteredTeams, [(team) => team.name.toLowerCase()])}

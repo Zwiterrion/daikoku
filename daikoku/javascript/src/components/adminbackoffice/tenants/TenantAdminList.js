@@ -151,7 +151,7 @@ const TenantAdminListComponent = (props) => {
           </div>
         </div>
         <div className="row">
-          <div className="col-12 mb-3 d-flex justify-content-start">
+          <div className="col-12 mb-3 d-flex justify-content-between">
             <Select
               placeholder={t('Add new admin', props.currentLanguage)}
               className="add-member-select mr-2 reactSelect"
@@ -161,11 +161,19 @@ const TenantAdminListComponent = (props) => {
               filterOption={(data, search) => _.values(data.value).some((v) => v.includes(search))}
               classNamePrefix="reactSelect"
             />
-            <input
-              placeholder={t('Find an admin', props.currentLanguage)}
-              className="form-control"
-              onChange={(e) => setSearch(e.target.value)}
-            />
+
+            <div className="form-group">
+              <div className="input-group">
+                <div className="input-group-prepend">
+                  <div className="input-group-text"><i className="fas fa-search"></i></div>
+                </div>
+                <input
+                    placeholder={t('Find an admin', props.currentLanguage)}
+                    className="form-control"
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+            </div>
           </div>
         </div>
         <PaginatedComponent

@@ -66,13 +66,20 @@ export class TenantListComponent extends Component {
                     <i className="fas fa-plus-circle" />
                   </a>
                 </h1>
-                <input
-                  placeholder={t('Find a tenant', this.props.currentLanguage)}
-                  className="form-control col-5"
-                  onChange={(e) => {
-                    this.setState({ search: e.target.value });
-                  }}
-                />
+                <div className="form-group">
+                  <div className="input-group">
+                    <div className="input-group-prepend">
+                      <div className="input-group-text"><i className="fas fa-search"></i></div>
+                    </div>
+                    <input
+                        placeholder={t('Find a tenant', this.props.currentLanguage)}
+                        className="form-control"
+                        onChange={(e) => {
+                          this.setState({ search: e.target.value });
+                        }}
+                    />
+                  </div>
+                </div>
               </div>
               <PaginatedComponent
                 currentLanguage={this.props.currentLanguage}
