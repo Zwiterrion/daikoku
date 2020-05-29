@@ -1,3 +1,10 @@
+.table-wrap {
+	display: block;
+    max-width: 100%;
+    overflow-x: scroll;
+    border-bottom: 1px solid black;
+}
+
 .reactTableV7 {
 	width: 100%;
 	font-size: 14px;

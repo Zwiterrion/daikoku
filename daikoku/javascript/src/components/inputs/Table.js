@@ -230,43 +230,47 @@ export const Table = ({ fetchItems, columns, injectTopBar, injectTable, defaultS
               {tablePagination}
             </div>
           </div>
-          <table {...getTableProps()} className="reactTableV7">
-            <thead>
-              {headerGroups.map((headerGroup, idx) => (
-                <tr key={`thead-tr-${idx}`} {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map((column, idx) => (
-                    <th key={`thead-th-${idx}`} className={classNames({
-                      "--sort-asc": column.isSorted && !column.isSortedDesc,
-                      "--sort-desc": column.isSorted && column.isSortedDesc
-                    })} style={column.style} {...column.getHeaderProps(column.getSortByToggleProps())}>
-                      <div style={column.style}>{column.render("Header")}</div>
-                      {column.canResize && <div
+          <div className="table-wrap">
+            <table {...getTableProps()} className="reactTableV7">
+              <thead>
+                {headerGroups.map((headerGroup, idx) => (
+                  <tr key={`thead-tr-${idx}`} {...headerGroup.getHeaderGroupProps()}>
+                    {headerGroup.headers.map((column, idx) => (
+                      <th key={`thead-th-${idx}`} className={classNames({
+                        "--sort-asc": column.isSorted && !column.isSortedDesc,
+                        "--sort-desc": column.isSorted && column.isSortedDesc
+                      })} style={column.style} {...column.getHeaderProps(column.getSortByToggleProps())}>
+                        <div style={column.style}>{column.render("Header")}</div>
+                        {column.canResize && <div
                           {...column.getResizerProps()}
                           className={`resizer ${column.isResizing ? 'isResizing' : ''}`}
-                      />}
-                      <div className="my-2">{column.canFilter ? column.render('Filter') : null}</div>
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody {...getTableBodyProps()}>
-              {page.map((row, idx) => {
-                prepareRow(row);
-                return (
-                  <tr {...row.getRowProps()} key={`tr-${idx}`}>
-                    {row.cells.map((cell, idx) => {
-                      return (
-                        <td style={cell.column.style} {...cell.getCellProps()} key={`td-${idx}`}>
-                          {cell.render('Cell')}
-                        </td>
-                      );
-                    })}
+                        />}
+                        <div className="my-2">{column.canFilter ? column.render('Filter') : null}</div>
+                      </th>
+                    ))}
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                ))}
+              </thead>
+              <tbody {...getTableBodyProps()}>
+                {page.map((row, idx) => {
+                  prepareRow(row);
+                  return (
+                    <tr {...row.getRowProps()} key={`tr-${idx}`}>
+                      {row.cells.map((cell, idx) => {
+                        const cellProps = cell.getCellProps();
+                        return (
+                          <td style={{ ...cell.column.style, ...cellProps.style }} key={`td-${idx}`}>
+                            {cell.render('Cell')}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          
           {tablePagination}
         </div>
       </div>
