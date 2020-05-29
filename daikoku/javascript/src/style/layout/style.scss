@@ -98,6 +98,9 @@ a.nav-link.active {
 .additionalContent {
   background-color: $aside-bg-color;
   color:$aside-text-color;
+  @media screen and (max-width: 576px) {
+    order: 1;
+  }
 }
 
 .navDocumentation ul {
