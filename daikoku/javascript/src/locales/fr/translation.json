@@ -440,6 +440,7 @@
   "Auth. name": "Nom Auth.",
   "The auth. name in api swagger": "Le nom auth. dans le swagger api",
   "The apikey client id": "Le client id de la clé d'api ",
+  "The apikey client secret": "Le client secret de la clé d'api ",
   "Auth. type": "Type d'Auth.",
   "otoroshi.test.key.generator.button": "Générer une clé de test dédiée dans Otoroshi",
   "otoroshi.test.key.modal.description": "Pour que tout fonctionne correctement, vous devez ajouter une correspondance de balises (OneTagIn / AllTagIn) dans votre descripteur de service dans la section \"Contraintes des clés Api\". Assurez-vous que ce descripteur de service est le bon pour les tests et non un système de production.",

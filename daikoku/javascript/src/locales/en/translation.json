@@ -440,6 +440,7 @@
     "Auth. name": "Auth. name",
     "The auth. name in api swagger": "The auth. name in api swagger",
     "The apikey client id": "The apikey client id",
+    "The apikey client secret": "The apikey client secret",
     "Auth. type": "Auth. type",
     "otoroshi.test.key.generator.button": "Generate a dedicated testing key in Otoroshi",
     "otoroshi.test.key.modal.description": "In order to make everything work, you'll have to add a tags match (OneTagIn / AllTagIn) in your service descriptor in the \"Api Keys Constraints\" section. Make sure this service descriptor is the right one for testing and not a production system.",
