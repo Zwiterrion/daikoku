@@ -107,7 +107,8 @@ export class TeamApiKeysComponent extends Component {
                   extractKey={(item) => item._id}
                   injectTable={(t) => (this.table = t)}
                 />
-                <button className="btn btn-sm btn-danger-negative mt-1" onClick={this.cleanSubs}>
+                <button className="btn btn-sm btn-outline-danger mt-1" onClick={this.cleanSubs}>
+                  <i className="fas fa-trash mr-1"></i>
                   <Translation
                     i18nkey="clean archived apikeys"
                     language={this.props.currentLanguage}>
