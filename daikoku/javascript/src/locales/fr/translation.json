@@ -693,5 +693,8 @@
   "mandatory.metadata.label": "Métadonnées obligatoires (%s)",
   "Additional metadata": "Métadonnées additionelles",
   "create.metadata.option.label": "Créer l'option %s",
-  "Team apis": "APIs d'équipe"
+  "Team apis": "APIs d'équipe",
+  "Authorized entities": "Authorized entities",
+  "Authorized.entities.placeholder": "Selectionnez les service groupes de services et/ou les services Otoroshi",
+  "authorized.entities.help": "Selectionnez les service groupes de services et/ou les services Otoroshi pour lesquels la clé d'API sera authorizée d'y accéder"
 }

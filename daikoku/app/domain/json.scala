@@ -978,7 +978,6 @@ object json {
         )
       } recover {
         case e =>
-          AppLogger.error(Json.prettyPrint(json), e)
           JsError(e.getMessage)
       } get
     }
