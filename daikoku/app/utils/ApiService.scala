@@ -84,7 +84,7 @@ class ApiService(env: Env, otoroshiClient: OtoroshiClient) {
         clientId = clientId,
         clientSecret = clientSecret,
         clientName = clientName,
-        authorizedGroup = groupId,
+        authorizedEntities = AuthorizedEntities(groups = Set(OtoroshiServiceGroupId(groupId))), //FIXME: [#119]
         throttlingQuota = 1000,
         dailyQuota = RemainingQuotas.MaxValue,
         monthlyQuota = RemainingQuotas.MaxValue,
@@ -219,12 +219,10 @@ class ApiService(env: Env, otoroshiClient: OtoroshiClient) {
       case None => Future.successful(Left(OtoroshiSettingsNotFound))
       case Some(otoSettings) =>
         implicit val otoroshiSettings: OtoroshiSettings = otoSettings
-        plan.otoroshiTarget.map(_.serviceGroup) match {
+        plan.otoroshiTarget.map(_.authorizedEntities) match {
           case None => Future.successful(Left(ApiNotLinked))
-          case Some(groupId) =>
-            otoroshiClient
-              .getServiceGroup(groupId.value)
-              .flatMap(group => createKey(api, plan, team, group))
+          case Some(authorizedEntities) if authorizedEntities.isEmpty => Future.successful(Left(ApiNotLinked))
+          case Some(authorizedEntities) => ??? //FIXME: [#119]
         }
     }
   }
@@ -242,42 +240,10 @@ class ApiService(env: Env, otoroshiClient: OtoroshiClient) {
         case None => Future.successful(Left(OtoroshiSettingsNotFound))
         case Some(otoSettings) =>
           implicit val otoroshiSettings: OtoroshiSettings = otoSettings
-          plan.otoroshiTarget.map(_.serviceGroup) match {
+          plan.otoroshiTarget.map(_.authorizedEntities) match {
             case None => Future.successful(Left(ApiNotLinked))
-            case Some(groupId) =>
-              otoroshiClient
-                .getServiceGroup(groupId.value)
-                .flatMap(group => {
-                  val groupId = (group \ "id").as[String]
-
-                  val r: EitherT[Future, AppError, JsObject] = for {
-                    apiKey <- EitherT(
-                      otoroshiClient.getApikey(groupId,
-                        subscription.apiKey.clientId))
-                      .leftMap(err => OtoroshiError(JsError.toJson(err)))
-                    _ <- EitherT.liftF(
-                      otoroshiClient.updateApiKey(groupId,
-                        apiKey.copy(
-                          authorizedGroup = groupId,
-                          throttlingQuota = apiKey.throttlingQuota,
-                          dailyQuota = apiKey.dailyQuota,
-                          monthlyQuota = apiKey.monthlyQuota,
-                          metadata = apiKey.metadata ++ subscription.customMetadata
-                            .flatMap(_.asOpt[Map[String, String]])
-                            .getOrElse(Map.empty[String, String])
-                        )))
-                    _ <- EitherT.liftF(
-                      env.dataStore.apiSubscriptionRepo
-                        .forTenant(tenant.id)
-                        .save(subscription)
-                    )
-                  } yield {
-                    Json.obj("done" -> true,
-                      "subscription" -> subscription.asSafeJson)
-                  }
-
-                  r.value
-                })
+            case Some(authorizedEntities) if authorizedEntities.isEmpty => Future.successful(Left(ApiNotLinked))
+            case Some(authorizedEntities) => ??? //FIXME: [#119]
           }
       }
     }
@@ -322,12 +288,10 @@ class ApiService(env: Env, otoroshiClient: OtoroshiClient) {
       case None => Future.successful(Left(OtoroshiSettingsNotFound))
       case Some(otoSettings) =>
         implicit val otoroshiSettings: OtoroshiSettings = otoSettings
-        plan.otoroshiTarget.map(_.serviceGroup) match {
+        plan.otoroshiTarget.map(_.authorizedEntities) match {
           case None => Future.successful(Left(ApiNotLinked))
-          case Some(groupId) =>
-            otoroshiClient
-              .getServiceGroup(groupId.value)
-              .flatMap(group => deleteKey(api, team, group))
+          case Some(authorizedEntities) if authorizedEntities.isEmpty => Future.successful(Left(ApiNotLinked))
+          case Some(authorizedEntities) => ??? //FIXME: [#119]
         }
     }
   }
@@ -344,34 +308,10 @@ class ApiService(env: Env, otoroshiClient: OtoroshiClient) {
       case None => Future.successful(Left(OtoroshiSettingsNotFound))
       case Some(otoSettings) =>
         implicit val otoroshiSettings: OtoroshiSettings = otoSettings
-        plan.otoroshiTarget.map(_.serviceGroup) match {
+        plan.otoroshiTarget.map(_.authorizedEntities) match {
           case None => Future.successful(Left(ApiNotLinked))
-          case Some(groupId) =>
-            otoroshiClient
-              .getServiceGroup(groupId.value)
-              .flatMap(group => {
-                val groupId = (group \ "id").as[String]
-
-                val r: EitherT[Future, AppError, JsObject] = for {
-                  apiKey <- EitherT(
-                    otoroshiClient.getApikey(groupId,
-                      subscription.apiKey.clientId))
-                    .leftMap(err => OtoroshiError(JsError.toJson(err)))
-                  _ <- EitherT.liftF(
-                    otoroshiClient.updateApiKey(groupId,
-                      apiKey.copy(enabled = enabled)))
-                  _ <- EitherT.liftF(
-                    env.dataStore.apiSubscriptionRepo
-                      .forTenant(tenant.id)
-                      .save(subscription.copy(enabled = enabled))
-                  )
-                } yield {
-                  Json.obj("done" -> true,
-                    "subscription" -> subscription.copy(enabled = enabled).asJson)
-                }
-
-                r.value
-              })
+          case Some(authorizedEntities) if authorizedEntities.isEmpty => FastFuture.successful(Left(ApiNotLinked))
+          case Some(authorizedEntities) => ??? //FIXME: [#119]
         }
     }
   }
@@ -396,35 +336,10 @@ class ApiService(env: Env, otoroshiClient: OtoroshiClient) {
       case None => Future.successful(Left(OtoroshiSettingsNotFound))
       case Some(otoSettings) =>
         implicit val otoroshiSettings: OtoroshiSettings = otoSettings
-        plan.otoroshiTarget.map(_.serviceGroup) match {
+        plan.otoroshiTarget.map(_.authorizedEntities) match {
           case None => Future.successful(Left(ApiNotLinked))
-          case Some(groupId) =>
-            otoroshiClient
-              .getServiceGroup(groupId.value)
-              .flatMap(group => {
-                val groupId = (group \ "id").as[String]
-                val newClientSecret = IdGenerator.token(64)
-                val updatedSubscription = subscription.copy(apiKey = subscription.apiKey.copy(clientSecret = newClientSecret))
-
-                val r: EitherT[Future, AppError, JsObject] = for {
-                  apiKey <- EitherT(
-                    otoroshiClient.getApikey(groupId,
-                      subscription.apiKey.clientId))
-                    .leftMap(err => OtoroshiError(JsError.toJson(err)))
-                  _ <- EitherT.liftF(
-                    otoroshiClient.updateApiKey(groupId,
-                      apiKey.copy(clientSecret = newClientSecret)))
-                  _ <- EitherT.liftF(
-                    env.dataStore.apiSubscriptionRepo
-                      .forTenant(tenant.id)
-                      .save(updatedSubscription)
-                  )
-                } yield {
-                  Json.obj("done" -> true,
-                    "subscription" -> updatedSubscription.asJson)
-                }
-                r.value
-              })
+          case Some(authorizedEntities) if authorizedEntities.isEmpty => Future.successful(Left(ApiNotLinked))
+          case Some(authorizedEntities) => ??? //FIXME: [#119]
         }
     }
   }
@@ -455,41 +370,10 @@ class ApiService(env: Env, otoroshiClient: OtoroshiClient) {
         case None => Future.successful(Left(OtoroshiSettingsNotFound))
         case Some(otoSettings) =>
           implicit val otoroshiSettings: OtoroshiSettings = otoSettings
-          plan.otoroshiTarget.map(_.serviceGroup) match {
+          plan.otoroshiTarget.map(_.authorizedEntities) match {
             case None => Future.successful(Left(ApiNotLinked))
-            case Some(groupId) =>
-              otoroshiClient
-                .getServiceGroup(groupId.value)
-                .flatMap(group => {
-                  val groupId = (group \ "id").as[String]
-                  val defaultSubscriptionRotation = ApiSubscriptionRotation()
-
-                  val r: EitherT[Future, AppError, JsObject] = for {
-                    apiKey <- EitherT(
-                      otoroshiClient.getApikey(groupId,
-                        subscription.apiKey.clientId))
-                      .leftMap(err => OtoroshiError(JsError.toJson(err)))
-                    _ <- EitherT.liftF(
-                      otoroshiClient.updateApiKey(groupId,
-                        apiKey.copy(rotation = apiKey.rotation.map(r => r.copy(enabled = !r.enabled)).orElse(Some(ApiKeyRotation())))))
-                    _ <- EitherT.liftF(
-                      env.dataStore.apiSubscriptionRepo
-                        .forTenant(tenant.id)
-                        .save(subscription.copy(rotation = subscription.rotation.map(r => r.copy(enabled = !r.enabled, rotationEvery = rotationEvery, gracePeriod = gracePeriod))
-                          .orElse(Some(ApiSubscriptionRotation(rotationEvery = rotationEvery, gracePeriod = gracePeriod)))))
-                    )
-                    updatedSubscription <- EitherT.liftF(
-                      env.dataStore.apiSubscriptionRepo
-                        .forTenant(tenant.id)
-                        .findById(subscription.id)
-                    )
-
-                  } yield {
-                    Json.obj("done" -> true,
-                      "subscription" -> updatedSubscription.get.asJson)
-                  }
-                  r.value
-                })
+            case Some(authorizedEntities) if authorizedEntities.isEmpty => Future.successful(Left(ApiNotLinked))
+            case Some(authorizedEntities) => ??? //FIXME: [#119]
           }
       }
     }

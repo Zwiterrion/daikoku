@@ -152,6 +152,7 @@ trait PasswordResetRepo extends Repo[PasswordReset, MongoId]
 trait AccountCreationRepo extends Repo[AccountCreation, MongoId]
 trait TenantRepo extends Repo[Tenant, TenantId]
 trait UserRepo extends Repo[User, UserId]
+trait EvolutionRepo extends Repo[Evolution, MongoId]
 trait TeamRepo extends TenantCapableRepo[Team, TeamId] {
   def myTeams(tenant: Tenant, user: User)(
       implicit env: Env,
@@ -206,6 +207,7 @@ trait DataStore {
   def translationRepo: TranslationRepo
   def passwordResetRepo: PasswordResetRepo
   def accountCreationRepo: AccountCreationRepo
+  def evolutionRepo: EvolutionRepo
   def exportAsStream(pretty: Boolean)(implicit ec: ExecutionContext,
                                       mat: Materializer,
                                       env: Env): Source[ByteString, _]

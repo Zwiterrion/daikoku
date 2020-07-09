@@ -30,6 +30,10 @@ import scala.concurrent.duration.FiniteDuration
 import scala.util.Try
 
 object json {
+  implicit class RegexOps(sc: StringContext) {
+    def r = new scala.util.matching.Regex(sc.parts.mkString)
+  }
+
   val BillingTimeUnitFormat = new Format[BillingTimeUnit] {
     override def reads(json: JsValue): JsResult[BillingTimeUnit] =
       Try {
@@ -966,8 +970,7 @@ object json {
           OtoroshiTarget(
             otoroshiSettings =
               (json \ "otoroshiSettings").as(OtoroshiSettingsIdFormat),
-            serviceGroup =
-              (json \ "serviceGroup").as(OtoroshiServiceGroupIdFormat),
+            authorizedEntities = (json \ "authorizedEntities").asOpt(AuthorizedEntitiesFormat),
             apikeyCustomization = (json \ "apikeyCustomization")
               .asOpt(ApikeyCustomizationFormat)
               .getOrElse(ApikeyCustomization())
@@ -975,12 +978,16 @@ object json {
         )
       } recover {
         case e =>
+          AppLogger.error(Json.prettyPrint(json), e)
           JsError(e.getMessage)
       } get
     }
     override def writes(o: OtoroshiTarget): JsValue = Json.obj(
       "otoroshiSettings" -> o.otoroshiSettings.asJson,
-      "serviceGroup" -> o.serviceGroup.asJson,
+      "authorizedEntities" -> o.authorizedEntities
+        .map(_.asJson)
+        .getOrElse(JsNull)
+        .as[JsValue],
       "apikeyCustomization" -> o.apikeyCustomization.asJson
     )
   }
@@ -1611,13 +1618,58 @@ object json {
     )
   }
 
+  //just because otoroshi do not use the actual entities format ;)
+  val AuthorizedEntitiesOtoroshiFormat: Format[AuthorizedEntities] =
+    new Format[AuthorizedEntities] {
+      override def writes(o: AuthorizedEntities): JsValue = Json.arr(
+        o.groups.map(g => s"group_${g.value}").map(JsString.apply).toSeq ++
+        o.services.map(g => s"service_${g.value}").map(JsString.apply).toSeq
+      )
+
+      override def reads(json: JsValue): JsResult[AuthorizedEntities] =
+        Try {
+          JsSuccess(
+            json.as[JsArray].value.map(_.as[String]).foldLeft(AuthorizedEntities()){
+              (entities, value) => {
+                value match {
+                  case r"group_.*" => entities.copy(groups = entities.groups + OtoroshiServiceGroupId(value.replace("group_", "")))
+                  case r"service_.*" => entities.copy(services = entities.services + OtoroshiServiceId(value.replace("service_", "")))
+                }
+              }
+            }
+          )
+        } recover {
+          case e => JsError(e.getMessage)
+        } get
+    }
+
+  val AuthorizedEntitiesFormat: Format[AuthorizedEntities] =
+    new Format[AuthorizedEntities] {
+      override def writes(o: AuthorizedEntities): JsValue = Json.obj(
+        "groups" -> SetOtoroshiServiceGroupsIdFormat.writes(o.groups),
+        "services" -> SetOtoroshiServicesIdFormat.writes(o.services)
+      )
+
+      override def reads(json: JsValue): JsResult[AuthorizedEntities] =
+        Try {
+          JsSuccess(
+            AuthorizedEntities(
+              groups = (json \ "groups").as(SetOtoroshiServiceGroupsIdFormat),
+              services = (json \ "services").as(SetOtoroshiServicesIdFormat),
+            )
+          )
+        } recover {
+          case e => JsError(e.getMessage)
+        } get
+    }
+
   val ActualOtoroshiApiKeyFormat: Format[ActualOtoroshiApiKey] =
     new Format[ActualOtoroshiApiKey] {
       override def writes(apk: ActualOtoroshiApiKey): JsValue = Json.obj(
         "clientId" -> apk.clientId,
         "clientSecret" -> apk.clientSecret,
         "clientName" -> apk.clientName,
-        "authorizedGroup" -> apk.authorizedGroup,
+        "authorizedEntities" -> AuthorizedEntitiesFormat.writes(apk.authorizedEntities),
         "enabled" -> apk.enabled,
         "allowClientIdOnly" -> apk.allowClientIdOnly,
         "constrainedServicesOnly" -> apk.constrainedServicesOnly,
@@ -1640,7 +1692,7 @@ object json {
             clientId = (json \ "clientId").as[String],
             clientSecret = (json \ "clientSecret").as[String],
             clientName = (json \ "clientName").as[String],
-            authorizedGroup = (json \ "authorizedGroup").as[String],
+            authorizedEntities = (json \ "authorizedEntities").as(AuthorizedEntitiesFormat),
             enabled = (json \ "enabled").asOpt[Boolean].getOrElse(true),
             allowClientIdOnly =
               (json \ "allowClientIdOnly").asOpt[Boolean].getOrElse(false),
@@ -2401,6 +2453,30 @@ object json {
       )
     }
 
+  val EvolutionFormat: Format[Evolution] =
+    new Format[Evolution] {
+      override def reads(json: JsValue): JsResult[Evolution] =
+        Try {
+          JsSuccess(
+            Evolution(
+              id = (json \ "id").as(MongoIdFormat),
+              version = (json \ "version").as[String],
+              applied = (json \ "applied").as[Boolean],
+              date = (json \ "date").as(DateTimeFormat)
+            )
+          )
+        } recover {
+          case e => JsError(e.getMessage)
+        } get
+
+      override def writes(o: Evolution): JsValue = Json.obj(
+        "id" -> MongoIdFormat.writes(o.id),
+        "version" -> o.version,
+        "applied" -> o.applied,
+        "date" -> DateTimeFormat.writes(o.date)
+      )
+    }
+
   val SeqOtoroshiSettingsFormat = Format(Reads.seq(OtoroshiSettingsFormat),
                                          Writes.seq(OtoroshiSettingsFormat))
   val SeqVersionFormat =
@@ -2447,4 +2523,8 @@ object json {
     Format(Reads.seq(TranslationFormat), Writes.seq(TranslationFormat))
   val SeqCustomMetadataFormat =
     Format(Reads.seq(CustomMetadataFormat), Writes.seq(CustomMetadataFormat))
+  val SetOtoroshiServicesIdFormat =
+    Format(Reads.set(OtoroshiServiceIdFormat), Writes.set(OtoroshiServiceIdFormat))
+  val SetOtoroshiServiceGroupsIdFormat =
+    Format(Reads.set(OtoroshiServiceGroupIdFormat), Writes.set(OtoroshiServiceGroupIdFormat))
 }

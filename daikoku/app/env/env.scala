@@ -11,15 +11,18 @@ import com.auth0.jwt.{JWT, JWTVerifier}
 import fr.maif.otoroshi.daikoku.audit.AuditActorSupervizer
 import fr.maif.otoroshi.daikoku.domain.TeamPermission.Administrator
 import fr.maif.otoroshi.daikoku.domain.UsagePlan.FreeWithoutQuotas
+import fr.maif.otoroshi.daikoku.domain.{Evolution, MongoId}
 import fr.maif.otoroshi.daikoku.logger.AppLogger
 import fr.maif.otoroshi.daikoku.login.LoginFilter
 import fr.maif.otoroshi.daikoku.utils._
 import org.joda.time.DateTime
 import play.api.i18n.MessagesApi
+import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.mvc.EssentialFilter
 import play.api.{Configuration, Environment}
 import play.modules.reactivemongo.ReactiveMongoApi
+import reactivemongo.api.bson.BSONObjectID
 import storage.{DataStore, MongoDataStore}
 
 import scala.concurrent.duration.{FiniteDuration, _}
@@ -29,38 +32,48 @@ import scala.util.{Failure, Success}
 sealed trait DaikokuMode {
   def name: String
 }
+
 object DaikokuMode {
+
   case object Prod extends DaikokuMode {
     def name = "Prod"
   }
+
   case object Dev extends DaikokuMode {
     def name = "Dev"
   }
+
 }
 
 sealed trait TenantProvider {
   def name: String
 }
+
 object TenantProvider {
+
   case object Local extends TenantProvider {
     def name: String = "Local"
   }
+
   case object Header extends TenantProvider {
     def name: String = "Header"
   }
+
   case object Hostname extends TenantProvider {
     def name: String = "Hostname"
   }
+
   val values: Seq[TenantProvider] =
     Seq(Local, Header, Hostname)
+
   def apply(name: String): Option[TenantProvider] = name.toLowerCase() match {
-    case "Local"    => Some(Local)
-    case "local"    => Some(Local)
-    case "Header"   => Some(Header)
-    case "header"   => Some(Header)
+    case "Local" => Some(Local)
+    case "local" => Some(Local)
+    case "Header" => Some(Header)
+    case "header" => Some(Header)
     case "Hostname" => Some(Hostname)
     case "hostname" => Some(Hostname)
-    case _          => None
+    case _ => None
   }
 }
 
@@ -100,9 +113,11 @@ object InitConfig {
 }
 
 sealed trait AdminApiConfig
+
 case class LocalAdminApiConfig(key: String) extends AdminApiConfig
+
 case class OtoroshiAdminApiConfig(claimsHeaderName: String, algo: Algorithm)
-    extends AdminApiConfig
+  extends AdminApiConfig
 
 object AdminApiConfig {
   def apply(config: Configuration): AdminApiConfig = {
@@ -135,7 +150,7 @@ class Config(val underlying: Configuration) {
   lazy val mode: DaikokuMode =
     underlying.getOptional[String]("daikoku.mode").map(_.toLowerCase) match {
       case Some("dev") => DaikokuMode.Dev
-      case _           => DaikokuMode.Prod
+      case _ => DaikokuMode.Prod
     }
 
   lazy val secret: String = underlying
@@ -201,19 +216,32 @@ class Config(val underlying: Configuration) {
 
 sealed trait Env {
   def environment: Environment
+
   def onStartup(): Unit
+
   def onShutdown(): Unit
+
   def snowflakeGenerator: IdGenerator
+
   def auditActor: ActorRef
+
   def defaultActorSystem: ActorSystem
+
   def defaultMaterializer: Materializer
+
   def defaultExecutionContext: ExecutionContext
+
   def dataStore: DataStore
+
   def assetsStore: AssetsDataStore
+
   def wsClient: WSClient
+
   def config: Config
+
   def identityFilters(implicit mat: Materializer,
                       ec: ExecutionContext): Seq[EssentialFilter]
+
   def expositionFilters(implicit mat: Materializer,
                         ec: ExecutionContext): Seq[EssentialFilter]
 }
@@ -223,10 +251,10 @@ class DaikokuEnv(ws: WSClient,
                  configuration: Configuration,
                  reactiveMongoApi: ReactiveMongoApi,
                  messagesApi: MessagesApi)
-    extends Env {
+  extends Env {
 
   val actorSystem: ActorSystem = ActorSystem("daikoku")
-  val materializer: Materializer = Materializer.createMaterializer(actorSystem)
+  implicit val materializer: Materializer = Materializer.createMaterializer(actorSystem)
   val snowflakeSeed: Long =
     configuration.getOptional[Long]("daikoku.snowflake.seed").get
   val snowflakeGenerator: IdGenerator = IdGenerator(snowflakeSeed)
@@ -241,11 +269,17 @@ class DaikokuEnv(ws: WSClient,
 
   override def defaultExecutionContext: ExecutionContext =
     actorSystem.dispatcher
+
   override def defaultActorSystem: ActorSystem = actorSystem
+
   override def defaultMaterializer: Materializer = materializer
+
   override def dataStore: DataStore = mongoDataStore
+
   override def wsClient: WSClient = ws
+
   override def config: Config = daikokuConfig
+
   override def assetsStore: AssetsDataStore = s3assetsStore
 
   override def onStartup(): Unit = {
@@ -257,12 +291,11 @@ class DaikokuEnv(ws: WSClient,
         case true =>
           config.init.data.from match {
             case Some(path)
-                if path.startsWith("http://") || path
-                  .startsWith("https://") =>
+              if path.startsWith("http://") || path
+                .startsWith("https://") =>
               AppLogger.warn(
                 s"Main dataStore seems to be empty, importing from $path ...")
               implicit val ec: ExecutionContext = defaultExecutionContext
-              implicit val mat: Materializer = defaultMaterializer
               implicit val env: DaikokuEnv = this
               val initialDataFu = wsClient
                 .url(path)
@@ -282,7 +315,6 @@ class DaikokuEnv(ws: WSClient,
               AppLogger.warn(
                 s"Main dataStore seems to be empty, importing from $path ...")
               implicit val ec: ExecutionContext = defaultExecutionContext
-              implicit val mat: Materializer = defaultMaterializer
               implicit val env: DaikokuEnv = this
               val initialDataFu =
                 dataStore.importFromStream(FileIO.fromPath(Paths.get(path)))
@@ -414,7 +446,7 @@ class DaikokuEnv(ws: WSClient,
                 "Please avoid using the default tenant for anything else than configuring Daikoku")
               AppLogger.warn("")
           }
-        case false =>
+        case false =>  evolutions.run(dataStore)
       }
     }
 

@@ -9,11 +9,7 @@ import controllers.AppError
 import fr.maif.otoroshi.daikoku.actions.DaikokuAction
 import fr.maif.otoroshi.daikoku.audit.AuditTrailEvent
 import fr.maif.otoroshi.daikoku.ctrls.authorizations.async._
-import fr.maif.otoroshi.daikoku.domain.{
-  ActualOtoroshiApiKey,
-  ApiKeyRestrictions,
-  TestingAuth
-}
+import fr.maif.otoroshi.daikoku.domain.{ActualOtoroshiApiKey, ApiKeyRestrictions, AuthorizedEntities, OtoroshiServiceGroupId, TestingAuth}
 import fr.maif.otoroshi.daikoku.domain.json.OtoroshiSettingsFormat
 import fr.maif.otoroshi.daikoku.env.Env
 import fr.maif.otoroshi.daikoku.utils.{ApiService, IdGenerator, OtoroshiClient}
@@ -22,12 +18,7 @@ import org.joda.time.DateTime
 import play.api.http.HttpEntity
 import play.api.libs.json.{JsArray, JsError, JsSuccess, Json}
 import play.api.libs.streams.Accumulator
-import play.api.mvc.{
-  AbstractController,
-  BodyParser,
-  ControllerComponents,
-  Request
-}
+import play.api.mvc.{AbstractController, BodyParser, ControllerComponents, Request}
 
 class OtoroshiSettingsController(DaikokuAction: DaikokuAction,
                                  apiService: ApiService,
@@ -271,12 +262,10 @@ class OtoroshiSettingsController(DaikokuAction: DaikokuAction,
                           clientId = clientId,
                           clientSecret = clientSecret,
                           clientName = clientName,
-                          authorizedGroup = serviceGroup,
+                          authorizedEntities = AuthorizedEntities(groups = Set(OtoroshiServiceGroupId(serviceGroup))),
                           throttlingQuota = 10,
                           dailyQuota = 10000,
                           monthlyQuota = 300000,
-                          allowClientIdOnly = false,
-                          readOnly = false,
                           constrainedServicesOnly = true,
                           tags = Seq(tag),
                           restrictions = ApiKeyRestrictions(),

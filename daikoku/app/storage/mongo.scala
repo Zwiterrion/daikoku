@@ -221,6 +221,7 @@ class MongoDataStore(env: Env, reactiveMongoApi: ReactiveMongoApi)
   private val _tenantRepo: TenantRepo =
     new MongoTenantRepo(env, reactiveMongoApi)
   private val _userRepo: UserRepo = new MongoUserRepo(env, reactiveMongoApi)
+  private val _evolutionRepo: EvolutionRepo = new MongoEvolutionRepo(env, reactiveMongoApi)
   private val _teamRepo: TeamRepo = MongoTenantCapableTeamRepo(
     () => new MongoTeamRepo(env, reactiveMongoApi),
     t => new MongoTenantTeamRepo(env, reactiveMongoApi, t))
@@ -266,6 +267,8 @@ class MongoDataStore(env: Env, reactiveMongoApi: ReactiveMongoApi)
   override def tenantRepo: TenantRepo = _tenantRepo
 
   override def userRepo: UserRepo = _userRepo
+
+  override def evolutionRepo: EvolutionRepo = _evolutionRepo
 
   override def teamRepo: TeamRepo = _teamRepo
 
@@ -571,6 +574,16 @@ class MongoUserRepo(env: Env, reactiveMongoApi: ReactiveMongoApi)
   override def format: Format[User] = json.UserFormat
 
   override def extractId(value: User): String = value.id.value
+}
+
+class MongoEvolutionRepo(env: Env, reactiveMongoApi: ReactiveMongoApi)
+    extends MongoRepo[Evolution, MongoId](env, reactiveMongoApi)
+    with EvolutionRepo {
+  override def collectionName: String = "evolutions"
+
+  override def format: Format[Evolution] = json.EvolutionFormat
+
+  override def extractId(value: Evolution): String = value.id.value
 }
 
 class MongoTeamRepo(env: Env, reactiveMongoApi: ReactiveMongoApi)
