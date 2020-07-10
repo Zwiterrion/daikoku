@@ -386,7 +386,7 @@ export class TeamApiPricing extends Component {
     if (!found.otoroshiTarget) {
       found.otoroshiTarget = {
         otoroshiSettings: null,
-        serviceGroup: null,
+        authorizedEntities: [],
       };
     }
     const flow = ['_id', 'type', 'customName', 'customDescription', ...this.otoroshiFlow(found)];
@@ -468,7 +468,7 @@ export class TeamApiPricing extends Component {
     if (!found.otoroshiTarget) {
       found.otoroshiTarget = {
         otoroshiSettings: null,
-        serviceGroup: null,
+        authorizedEntities: [],
       };
     }
     const flow = [
@@ -583,7 +583,7 @@ export class TeamApiPricing extends Component {
     if (!found.otoroshiTarget) {
       found.otoroshiTarget = {
         otoroshiSettings: null,
-        serviceGroup: null,
+        authorizedEntities: [],
       };
     }
     const flow = [
@@ -723,7 +723,7 @@ export class TeamApiPricing extends Component {
     if (!found.otoroshiTarget) {
       found.otoroshiTarget = {
         otoroshiSettings: null,
-        serviceGroup: null,
+        authorizedEntities: [],
       };
     }
     const flow = [
@@ -904,7 +904,7 @@ export class TeamApiPricing extends Component {
     if (!found.otoroshiTarget) {
       found.otoroshiTarget = {
         otoroshiSettings: null,
-        serviceGroup: null,
+        authorizedEntities: [],
       };
     }
     const flow = [
@@ -1093,7 +1093,7 @@ export class TeamApiPricing extends Component {
     if (!found.otoroshiTarget) {
       found.otoroshiTarget = {
         otoroshiSettings: null,
-        serviceGroup: null,
+        authorizedEntities: [],
       };
     }
     const flow = [

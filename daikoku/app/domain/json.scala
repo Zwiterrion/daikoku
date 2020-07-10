@@ -1620,7 +1620,7 @@ object json {
   //just because otoroshi do not use the actual entities format ;)
   val AuthorizedEntitiesOtoroshiFormat: Format[AuthorizedEntities] =
     new Format[AuthorizedEntities] {
-      override def writes(o: AuthorizedEntities): JsValue = Json.arr(
+      override def writes(o: AuthorizedEntities): JsValue = JsArray(
         o.groups.map(g => s"group_${g.value}").map(JsString.apply).toSeq ++
         o.services.map(g => s"service_${g.value}").map(JsString.apply).toSeq
       )
@@ -1668,7 +1668,7 @@ object json {
         "clientId" -> apk.clientId,
         "clientSecret" -> apk.clientSecret,
         "clientName" -> apk.clientName,
-        "authorizedEntities" -> AuthorizedEntitiesFormat.writes(apk.authorizedEntities),
+        "authorizedEntities" -> AuthorizedEntitiesOtoroshiFormat.writes(apk.authorizedEntities),
         "enabled" -> apk.enabled,
         "allowClientIdOnly" -> apk.allowClientIdOnly,
         "constrainedServicesOnly" -> apk.constrainedServicesOnly,
@@ -1691,7 +1691,7 @@ object json {
             clientId = (json \ "clientId").as[String],
             clientSecret = (json \ "clientSecret").as[String],
             clientName = (json \ "clientName").as[String],
-            authorizedEntities = (json \ "authorizedEntities").as(AuthorizedEntitiesFormat),
+            authorizedEntities = (json \ "authorizedEntities").as(AuthorizedEntitiesOtoroshiFormat),
             enabled = (json \ "enabled").asOpt[Boolean].getOrElse(true),
             allowClientIdOnly =
               (json \ "allowClientIdOnly").asOpt[Boolean].getOrElse(false),

@@ -19,11 +19,12 @@ export const newPossibleUsagePlan = (customName) => ({
   rotation: false,
   otoroshiTarget: {
     otoroshiSettings: null,
-    serviceGroup: null,
+    authorizedEntities: {groups: [], services: []},
     clientIdOnly: false,
     constrainedServicesOnly: false,
     tags: [],
     metadata: {},
+    customMetadata: [],
     restrictions: {
       enabled: false,
       allowLast: true,

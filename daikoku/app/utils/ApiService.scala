@@ -32,12 +32,11 @@ class ApiService(env: Env, otoroshiClient: OtoroshiClient) {
       .orElse(defaultPlanOpt)
       .getOrElse(api.possibleUsagePlans.head)
 
-    def createKey(api: Api, plan: UsagePlan, team: Team, group: JsObject)(
+    def createKey(api: Api, plan: UsagePlan, team: Team, authorizedEntities: AuthorizedEntities)(
       implicit otoroshiSettings: OtoroshiSettings
     ): Future[Either[AppError, JsObject]] = {
       import cats.implicits._
-      // TODO: verify if group is in authorized groups (if some)
-      val groupId = (group \ "id").as[String]
+
       val createdAt = DateTime.now().toString()
       val clientId = IdGenerator.token(32)
       val clientSecret = IdGenerator.token(64)
@@ -74,8 +73,7 @@ class ApiService(env: Env, otoroshiClient: OtoroshiClient) {
         "tenant.name" -> tenant.name,
         "createdAt" -> createdAt,
         "client.id" -> clientId,
-        "client.name" -> clientName,
-        "group.id" -> groupId
+        "client.name" -> clientName
       ) ++ team.metadata.map(t => ("team.metadata." + t._1, t._2)) ++ user.metadata
         .map(
           t => ("user.metadata." + t._1, t._2)
@@ -84,7 +82,7 @@ class ApiService(env: Env, otoroshiClient: OtoroshiClient) {
         clientId = clientId,
         clientSecret = clientSecret,
         clientName = clientName,
-        authorizedEntities = AuthorizedEntities(groups = Set(OtoroshiServiceGroupId(groupId))), //FIXME: [#119]
+        authorizedEntities = authorizedEntities,
         throttlingQuota = 1000,
         dailyQuota = RemainingQuotas.MaxValue,
         monthlyQuota = RemainingQuotas.MaxValue,
@@ -135,7 +133,7 @@ class ApiService(env: Env, otoroshiClient: OtoroshiClient) {
         case _: Admin => apiKey
       }
       val r: EitherT[Future, AppError, JsObject] = for {
-        _ <- EitherT(otoroshiClient.createApiKey(groupId, tunedApiKey))
+        _ <- EitherT(otoroshiClient.createApiKey(tunedApiKey))
         _ <- EitherT.liftF(
           env.dataStore.apiSubscriptionRepo
             .forTenant(tenant.id)
@@ -219,10 +217,10 @@ class ApiService(env: Env, otoroshiClient: OtoroshiClient) {
       case None => Future.successful(Left(OtoroshiSettingsNotFound))
       case Some(otoSettings) =>
         implicit val otoroshiSettings: OtoroshiSettings = otoSettings
-        plan.otoroshiTarget.map(_.authorizedEntities) match {
+        plan.otoroshiTarget.flatMap(_.authorizedEntities) match {
           case None => Future.successful(Left(ApiNotLinked))
           case Some(authorizedEntities) if authorizedEntities.isEmpty => Future.successful(Left(ApiNotLinked))
-          case Some(authorizedEntities) => ??? //FIXME: [#119]
+          case Some(authorizedEntities) => createKey(api, plan, team, authorizedEntities)
         }
     }
   }

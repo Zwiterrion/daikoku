@@ -1225,6 +1225,7 @@ object RemainingQuotas {
 case class AuthorizedEntities(services: Set[OtoroshiServiceId] = Set.empty, groups: Set[OtoroshiServiceGroupId] = Set.empty)
   extends CanJson[AuthorizedEntities] {
   def asJson: JsValue = json.AuthorizedEntitiesFormat.writes(this)
+  def asOtoroshiJson: JsValue = json.AuthorizedEntitiesOtoroshiFormat.writes(this)
   def isEmpty: Boolean = services.isEmpty && groups.isEmpty
 }
 
