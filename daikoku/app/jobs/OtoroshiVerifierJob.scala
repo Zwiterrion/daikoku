@@ -132,7 +132,7 @@ class OtoroshiVerifierJob(client: OtoroshiClient, env: Env) {
     }
   }
 
-  private def verifyIfOtoroshiGroupsStillExists(): Future[Unit] = {
+  private def verifyIfOtoroshiGroupsStillExists(query: JsObject = Json.obj()): Future[Unit] = {
     def checkEntities(entities: AuthorizedEntities, otoroshi: OtoroshiSettings, api: Api): Unit = {
       entities.groups.map(group => client
         .getServiceGroup(group.value)(otoroshi)
@@ -161,7 +161,7 @@ class OtoroshiVerifierJob(client: OtoroshiClient, env: Env) {
 
 
 
-    env.dataStore.apiRepo.forAllTenant().findAllNotDeleted().map { apis =>
+    env.dataStore.apiRepo.forAllTenant().findNotDeleted(query).map { apis =>
       apis.map { api =>
         env.dataStore.tenantRepo.findByIdNotDeleted(api.tenant).map {
           case None =>
@@ -199,8 +199,8 @@ class OtoroshiVerifierJob(client: OtoroshiClient, env: Env) {
     }
   }
 
-  private def verifyIfOtoroshiApiKeysStillExists(): Future[Unit] = {
-    env.dataStore.apiSubscriptionRepo.forAllTenant().findAllNotDeleted().map {
+  private def verifyIfOtoroshiApiKeysStillExists(query: JsObject = Json.obj()): Future[Unit] = {
+    env.dataStore.apiSubscriptionRepo.forAllTenant().findNotDeleted(query).map {
       subscriptions =>
         AppLogger.debug(subscriptions.map(_.id.value).mkString(" - "))
         subscriptions.map { subscription =>
@@ -405,7 +405,8 @@ class OtoroshiVerifierJob(client: OtoroshiClient, env: Env) {
                                           dailyQuota = plan.maxRequestPerDay
                                             .getOrElse(apk.dailyQuota),
                                           monthlyQuota = plan.maxRequestPerMonth
-                                            .getOrElse(apk.monthlyQuota)
+                                            .getOrElse(apk.monthlyQuota),
+                                          authorizedEntities = target.authorizedEntities.getOrElse(AuthorizedEntities())
                                         )
 
                                         if (subscription.rotation.exists(
@@ -477,10 +478,10 @@ class OtoroshiVerifierJob(client: OtoroshiClient, env: Env) {
     }
   }
 
-  def verifyRotation(): Future[Unit] = {
+  def verifyRotation(query: JsObject = Json.obj()): Future[Unit] = {
     env.dataStore.apiSubscriptionRepo
       .forAllTenant()
-      .find(Json.obj("enabled" -> true, "rotation.enabled" -> true))
+      .find(query ++ Json.obj("enabled" -> true, "rotation.enabled" -> true))
       .map(
         subscriptions => {
           subscriptions.map {
@@ -685,14 +686,14 @@ class OtoroshiVerifierJob(client: OtoroshiClient, env: Env) {
       )
   }
 
-  def verify(): Future[Unit] = {
+  def verify(query: JsObject = Json.obj()): Future[Unit] = {
     logger.info("Verifying sync between daikoku and otoroshi")
     Future
       .sequence(
         Seq(
-          verifyRotation(),
+          verifyRotation(query),
           verifyIfOtoroshiGroupsStillExists(),
-          verifyIfOtoroshiApiKeysStillExists(),
+          verifyIfOtoroshiApiKeysStillExists(query),
         ))
       .map(_ => ())
   }
