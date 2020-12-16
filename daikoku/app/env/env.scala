@@ -1,7 +1,6 @@
 package fr.maif.otoroshi.daikoku.env
 
 import java.nio.file.Paths
-
 import akka.actor.{ActorRef, ActorSystem, PoisonPill}
 import akka.http.scaladsl.util.FastFuture
 import akka.stream.Materializer
@@ -20,8 +19,7 @@ import play.api.i18n.MessagesApi
 import play.api.libs.ws.WSClient
 import play.api.mvc.EssentialFilter
 import play.api.{Configuration, Environment}
-import play.modules.reactivemongo.ReactiveMongoApi
-import storage.{DataStore, MongoDataStore}
+import storage.{DataStore, PostgresDataStore, PostgresDatabase}
 
 import scala.concurrent.duration.{FiniteDuration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -227,7 +225,7 @@ sealed trait Env {
 class DaikokuEnv(ws: WSClient,
                  val environment: Environment,
                  configuration: Configuration,
-                 reactiveMongoApi: ReactiveMongoApi,
+                 db: PostgresDatabase,
                  messagesApi: MessagesApi)
     extends Env {
 
@@ -241,7 +239,7 @@ class DaikokuEnv(ws: WSClient,
     actorSystem.actorOf(AuditActorSupervizer.props(this, messagesApi))
 
   private val daikokuConfig = new Config(configuration)
-  private val mongoDataStore = new MongoDataStore(this, reactiveMongoApi)
+  private val postgresDataStore = new PostgresDataStore(this, db)
   private val s3assetsStore =
     new AssetsDataStore(actorSystem)(actorSystem.dispatcher, materializer)
 
@@ -249,7 +247,7 @@ class DaikokuEnv(ws: WSClient,
     actorSystem.dispatcher
   override def defaultActorSystem: ActorSystem = actorSystem
   override def defaultMaterializer: Materializer = materializer
-  override def dataStore: DataStore = mongoDataStore
+  override def dataStore: DataStore = postgresDataStore
   override def wsClient: WSClient = ws
   override def config: Config = daikokuConfig
   override def assetsStore: AssetsDataStore = s3assetsStore
@@ -299,7 +297,6 @@ class DaikokuEnv(ws: WSClient,
               import fr.maif.otoroshi.daikoku.utils.StringImplicits._
               import org.mindrot.jbcrypt.BCrypt
               import play.api.libs.json._
-              import reactivemongo.bson.BSONObjectID
 
               import scala.concurrent._
 
@@ -424,7 +421,7 @@ class DaikokuEnv(ws: WSClient,
       }
     }
 
-    mongoDataStore.start()
+    postgresDataStore.start()
 
     Source
       .tick(1.second, 5.seconds, ())
@@ -442,7 +439,7 @@ class DaikokuEnv(ws: WSClient,
 
   override def onShutdown(): Unit = {
     implicit val ec: ExecutionContext = defaultExecutionContext
-    mongoDataStore.stop()
+    postgresDataStore.stop()
     auditActor ! PoisonPill
     Await.result(actorSystem.terminate(), 20.seconds)
   }

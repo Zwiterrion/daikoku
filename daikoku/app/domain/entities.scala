@@ -16,7 +16,6 @@ import fr.maif.otoroshi.daikoku.utils._
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.twirl.api.Html
-import reactivemongo.bson.BSONObjectID
 
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}

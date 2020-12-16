@@ -28,8 +28,8 @@ import play.api.libs.ws.ahc.AhcWSComponents
 import play.api.mvc._
 import play.api.routing.Router
 import play.modules.reactivemongo.{
-  ReactiveMongoApi,
-  ReactiveMongoApiFromContext
+  PostgresDatabase,
+  PostgresDatabaseFromContext
 }
 import router.Routes
 
@@ -47,13 +47,13 @@ class DaikokuLoader extends ApplicationLoader {
 package object modules {
 
   class DaikokuComponentsInstances(context: Context)
-      extends ReactiveMongoApiFromContext(context)
+      extends PostgresDatabaseFromContext(context)
       //with BuiltInComponentsFromContext(context)
       with AssetsComponents
       with AhcWSComponents
       with I18nSupport {
 
-    implicit lazy val reactiveMongo: ReactiveMongoApi = reactiveMongoApi
+    implicit lazy val reactiveMongo: PostgresDatabase = db
 
     implicit lazy val env: Env = wire[DaikokuEnv]
 
